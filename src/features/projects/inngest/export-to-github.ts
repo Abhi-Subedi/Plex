@@ -90,12 +90,15 @@ export const exportToGithub = inngest.createFunction(
     // Wait for GitHub to initialize the repo (auto_init is async on GitHub's side)
     await step.sleep("wait-for-repo-init", "3s");
 
-    // Get the initial commit SHA (we need this as parent for our commit)
+    // Get the initial commit SHA (we need this as parent for our commit).
+    // Use the repo's actual default branch - it can be "main", "master",
+    // or whatever the user configured on GitHub.
+    const defaultBranch = repo.default_branch ?? "main";
     const initialCommitSha = await step.run("get-initial-commit", async () => {
       const { data: ref } = await octokit.rest.git.getRef({
         owner: user.login,
         repo: repoName,
-        ref: "heads/main",
+        ref: `heads/${defaultBranch}`,
       });
       return ref.object.sha;
     });
@@ -215,12 +218,12 @@ export const exportToGithub = inngest.createFunction(
       });
     });
 
-    // Update the main branch reference to point to our new commit
+    // Update the default branch reference to point to our new commit
     await step.run("update-branch-ref", async () => {
       return await octokit.rest.git.updateRef({
         owner: user.login,
         repo: repoName,
-        ref: "heads/main",
+        ref: `heads/${defaultBranch}`,
         sha: commit.sha,
         force: true,
       });
