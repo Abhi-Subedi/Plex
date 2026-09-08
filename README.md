@@ -1,10 +1,15 @@
-# ⚡ Polaris
+# ⚡ Plex
 
-Polaris is a full-stack web-based development environment designed to bring together **code editing, project management, file navigation, AI assistance, authentication, and a modern developer experience** into a single application.
+Plex is a modern web-based coding workspace that brings **projects, files, code editing, AI assistance, authentication, and developer tools** together in one place.
 
-The goal of Polaris is simple:
+The goal of Plex is to create a development environment that is:
 
-**Build a lightweight, modern, intelligent coding workspace that runs directly in the browser.**
+* ⚡ Fast
+* 🧠 AI-powered
+* 🛠️ Developer-focused
+* 🧩 Modular
+* 🌐 Browser-based
+* 🎨 Modern and intuitive
 
 ---
 
@@ -12,138 +17,162 @@ The goal of Polaris is simple:
 
 * 🗂️ **Project-based workspace**
 * 📁 **File and folder management**
-* 📝 **CodeMirror-powered code editor**
-* 🎨 **Syntax highlighting and custom themes**
-* 🔍 **Multiple programming language support**
+* 📝 **CodeMirror code editor**
+* 🎨 **Custom editor themes**
+* 🔤 **Multi-language syntax highlighting**
 * 🤖 **AI-powered coding assistance**
-* ⚡ **Gemini AI integration**
-* 🚀 **Groq AI integration / fallback support**
-* 🔐 **Authentication with Clerk**
-* 💾 **Real-time backend with Convex**
-* 🧠 **Global editor state with Zustand**
-* 🖥️ **Resizable editor/sidebar layout with Allotment**
-* 🏷️ **Editable project names**
-* 👁️ **Preview and pinned editor tabs**
+* ⚡ **Google Gemini integration**
+* 🚀 **Groq integration**
+* 🔄 **AI provider fallback architecture**
+* 🔐 **Clerk authentication**
+* 💾 **Convex backend and database**
+* 🧠 **Zustand editor state management**
+* ↔️ **Resizable workspace panels with Allotment**
+* 🏷️ **Project renaming**
+* 📑 **Editor tabs**
+* 👁️ **Preview tabs**
+* 📌 **Pinned tabs**
 * ⏱️ **Project update status**
-* 📦 **Modern Next.js App Router architecture**
-* 🌙 **Modern responsive UI**
+* 📱 **Modern responsive interface**
+* 🧱 **Feature-based project architecture**
 
 ---
 
-# 🎯 Purpose
+# 🎯 Why Plex?
 
-Modern developers frequently have to switch between multiple applications:
-
-```text
-File Explorer
-      ↓
-Code Editor
-      ↓
-Terminal
-      ↓
-Browser
-      ↓
-AI Assistant
-      ↓
-GitHub
-```
-
-Polaris aims to bring many of these workflows into a single environment.
-
-Instead of constantly switching between tools, Polaris provides a centralized workspace:
+Traditional development usually involves jumping between multiple applications:
 
 ```text
-                    ┌─────────────────────┐
-                    │       POLARIS       │
-                    │   Developer IDE     │
-                    └──────────┬──────────┘
-                               │
-          ┌────────────────────┼────────────────────┐
-          ↓                    ↓                    ↓
-     File System          Code Editor          AI Assistant
-          │                    │                    │
-          ↓                    ↓                    ↓
-       Projects            CodeMirror          Gemini / Groq
-          │                    │                    │
-          └────────────────────┼────────────────────┘
-                               ↓
-                            Convex
-                               ↓
-                           Database
+┌──────────────┐
+│ File Manager │
+└──────┬───────┘
+       ↓
+┌──────────────┐
+│ Code Editor  │
+└──────┬───────┘
+       ↓
+┌──────────────┐
+│ AI Assistant │
+└──────┬───────┘
+       ↓
+┌──────────────┐
+│   Browser    │
+└──────┬───────┘
+       ↓
+┌──────────────┐
+│   GitHub     │
+└──────────────┘
 ```
 
-The long-term vision is to make Polaris a **browser-native development environment where code, projects, and AI work together naturally.**
-
----
-
-# 🧠 How Polaris Works
-
-At a high level, Polaris follows a modern full-stack architecture.
+Plex aims to bring these workflows closer together:
 
 ```text
-                        USER
+                 ┌───────────────┐
+                 │     PLEX      │
+                 │  Web IDE       │
+                 └───────┬───────┘
                          │
-                         ▼
-                  ┌─────────────┐
-                  │   Next.js   │
-                  │     UI      │
-                  └──────┬──────┘
-                         │
-            ┌────────────┼────────────┐
-            ↓            ↓            ↓
-       Code Editor    Projects       AI
-       CodeMirror      UI          Assistant
-            │            │            │
-            └────────────┼────────────┘
-                         │
-                         ▼
-                    Application
-                      Logic
-                         │
-             ┌───────────┴───────────┐
-             ↓                       ↓
-          Convex                  AI APIs
-          Backend             Gemini / Groq
-             │                       │
-             ▼                       ▼
-          Database                AI Model
+          ┌──────────────┼──────────────┐
+          ↓              ↓              ↓
+       Projects        Editor           AI
+          │              │              │
+          ↓              ↓              ↓
+        Files         CodeMirror    Gemini / Groq
+          │              │              │
+          └──────────────┼──────────────┘
+                         ↓
+                      Convex
+                         ↓
+                      Database
 ```
+
+The vision is to create a **browser-native development environment where developers can manage their projects, edit code, and interact with AI without constantly switching between tools.**
 
 ---
 
 # 🏗️ Architecture
 
-Polaris is built using several modern technologies, each responsible for a specific part of the application.
-
-## Frontend
+Plex follows a modern full-stack architecture built around Next.js, Convex, and AI SDK.
 
 ```text
-Next.js
-   │
-   ├── React
-   ├── TypeScript
-   ├── Tailwind CSS
-   └── UI Components
+                         USER
+                          │
+                          ▼
+                   ┌─────────────┐
+                   │   Next.js   │
+                   │  Frontend   │
+                   └──────┬──────┘
+                          │
+            ┌─────────────┼─────────────┐
+            ↓             ↓             ↓
+        Projects        Editor          AI
+            │             │             │
+            ↓             ↓             ↓
+         Convex       CodeMirror     AI SDK
+            │                           │
+            ↓                    ┌──────┴──────┐
+        Database                 ↓             ↓
+                              Gemini         Groq
 ```
-
-The frontend handles:
-
-* Application UI
-* Project navigation
-* File navigation
-* Editor interface
-* Tabs
-* Authentication UI
-* AI interaction
-* Layout management
 
 ---
 
-## Code Editor
+# 🧩 Technology Stack
 
-Polaris uses **CodeMirror** as the core editor engine.
+| Technology        | Purpose                      |
+| ----------------- | ---------------------------- |
+| **Next.js 16**    | Full-stack React framework   |
+| **React**         | User interface               |
+| **TypeScript**    | Type safety                  |
+| **Tailwind CSS**  | Styling                      |
+| **Convex**        | Backend + database           |
+| **Clerk**         | Authentication               |
+| **Zustand**       | Client-side state management |
+| **CodeMirror**    | Code editor                  |
+| **Allotment**     | Resizable panels             |
+| **Vercel AI SDK** | AI integration               |
+| **Gemini**        | AI provider                  |
+| **Groq**          | AI provider / fallback       |
+| **Lucide React**  | Icons                        |
+| **date-fns**      | Date formatting              |
 
-The editor supports language extensions such as:
+---
+
+# 🖥️ Workspace
+
+The main Plex workspace is designed similarly to a modern IDE.
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                       PLEX NAVBAR                       │
+├───────────────────────┬─────────────────────────────────┤
+│                       │                                 │
+│                       │                                 │
+│       SIDEBAR         │           CODE EDITOR           │
+│                       │                                 │
+│   📁 Projects         │      ┌───────────────────┐      │
+│   📂 Files            │      │ index.tsx        │      │
+│                       │      ├───────────────────┤      │
+│                       │      │                   │      │
+│                       │      │  CodeMirror       │      │
+│                       │      │                   │      │
+│                       │      │                   │      │
+│                       │      └───────────────────┘      │
+│                       │                                 │
+└───────────────────────┴─────────────────────────────────┘
+```
+
+The sidebar can be resized using Allotment.
+
+---
+
+# 📝 Code Editor
+
+Plex uses **CodeMirror** as its editor engine.
+
+The editor is designed around independent extensions so functionality can be added without tightly coupling everything together.
+
+Supported language integrations include:
 
 ```text
 JavaScript
@@ -155,19 +184,7 @@ Markdown
 Python
 ```
 
-CodeMirror provides:
-
-* Syntax highlighting
-* Autocomplete
-* Editor commands
-* Language parsing
-* Custom themes
-* Selection tools
-* Editor extensions
-
-The editor architecture is organized around reusable extensions.
-
-Example:
+The editor architecture can include:
 
 ```text
 editor/
@@ -177,8 +194,8 @@ editor/
 │   └── Editor-view.tsx
 │
 └── extensions/
-    ├── theme
     ├── language
+    ├── theme
     ├── autocomplete
     ├── suggestions
     ├── quick-edit
@@ -187,47 +204,93 @@ editor/
 
 ---
 
-# 🗃️ Backend
+# 📑 Tab System
 
-Polaris uses **Convex** as its backend and database layer.
+Plex provides an IDE-like tab system powered by Zustand.
 
-Convex handles application data such as:
+Each project maintains its own editor state.
+
+```ts
+interface TabState {
+  openTabs: Id<"files">[];
+  activeTabId: Id<"files"> | null;
+  previewTabId: Id<"files"> | null;
+}
+```
+
+This enables:
+
+### Preview Tabs
+
+Opening a file can initially create a preview tab.
+
+### Pinned Tabs
+
+A file can be pinned so that it becomes a permanent tab.
+
+### Active Tab
+
+The currently selected file is tracked independently.
+
+Conceptually:
 
 ```text
-Users
+Project
+   │
+   ├── Open Tabs
+   │      ├── index.tsx
+   │      ├── App.tsx
+   │      └── styles.css
+   │
+   ├── Active Tab
+   │      └── App.tsx
+   │
+   └── Preview Tab
+          └── styles.css
+```
+
+---
+
+# 💾 Backend
+
+Plex uses **Convex** for backend functionality and persistent application data.
+
+The general data flow is:
+
+```text
+React UI
+   │
+   ▼
+Custom Hook
+   │
+   ▼
+Convex Query / Mutation
+   │
+   ▼
+Convex Backend
+   │
+   ▼
+Database
+   │
+   ▼
+Reactive UI Update
+```
+
+Convex can manage application entities such as:
+
+```text
 Projects
 Files
 Project metadata
 File metadata
+Users
 ```
-
-The basic flow is:
-
-```text
-React Component
-      │
-      ▼
-Custom Hook
-      │
-      ▼
-Convex Query / Mutation
-      │
-      ▼
-Convex Backend
-      │
-      ▼
-Database
-```
-
-This allows Polaris to keep application data synchronized between the frontend and backend.
 
 ---
 
 # 🔐 Authentication
 
-Authentication is handled using **Clerk**.
-
-The authentication flow is approximately:
+Plex uses **Clerk** for authentication.
 
 ```text
 User
@@ -239,13 +302,13 @@ Clerk
 Authenticated Session
  │
  ▼
-Polaris
+Plex
  │
  ▼
 Convex
 ```
 
-Clerk is responsible for:
+Authentication functionality can include:
 
 * Sign in
 * Sign up
@@ -255,130 +318,48 @@ Clerk is responsible for:
 
 ---
 
-# 🧠 Editor State Management
+# 🤖 AI System
 
-Polaris uses **Zustand** for client-side editor state.
+Plex is designed with a provider-based AI architecture.
 
-One important piece of state is the tab system.
-
-Conceptually:
-
-```text
-Project
-   │
-   ├── Open Tabs
-   │
-   ├── Active Tab
-   │
-   └── Preview Tab
-```
-
-The editor store maintains:
-
-```ts
-interface TabState {
-  openTabs: Id<"files">[];
-  activeTabId: Id<"files"> | null;
-  previewTabId: Id<"files"> | null;
-}
-```
-
-This allows Polaris to support IDE-like behavior.
-
-For example:
-
-```text
-Open file A
-    ↓
-Preview tab A
-
-Open file B
-    ↓
-Preview tab A becomes preview B
-
-Pin file B
-    ↓
-B becomes permanent
-
-Open file C
-    ↓
-C becomes preview
-```
-
----
-
-# 🖥️ Workspace Layout
-
-Polaris uses **Allotment** to create resizable panels.
-
-The layout is approximately:
-
-```text
-┌─────────────────────────────────────────────────────┐
-│                    Polaris Navbar                   │
-├───────────────────┬─────────────────────────────────┤
-│                   │                                 │
-│                   │                                 │
-│     Sidebar       │          Main Editor            │
-│                   │                                 │
-│   Projects        │                                 │
-│   Files           │          CodeMirror             │
-│   Navigation      │                                 │
-│                   │                                 │
-│                   │                                 │
-└───────────────────┴─────────────────────────────────┘
-          ↕
-      Resizable
-```
-
-Users can resize the sidebar according to their workflow.
-
----
-
-# 🤖 AI Architecture
-
-AI is designed as a provider-based system.
-
-Instead of tightly coupling Polaris to one AI provider, the application can use an abstraction layer.
-
-Conceptually:
+Instead of hard-coding the application to a single AI provider, the AI layer can communicate through the Vercel AI SDK.
 
 ```text
                      AI REQUEST
-                          │
-                          ▼
-                    ┌───────────┐
-                    │ AI Router │
-                    └─────┬─────┘
-                          │
-             ┌────────────┴────────────┐
-             ↓                         ↓
-          Gemini                     Groq
-             │                         │
-             └────────────┬────────────┘
-                          ↓
-                       Response
+                         │
+                         ▼
+                   ┌───────────┐
+                   │ AI Router │
+                   └─────┬─────┘
+                         │
+                ┌────────┴────────┐
+                ↓                 ↓
+             Gemini              Groq
+                │                 │
+                └────────┬────────┘
+                         ↓
+                      Response
 ```
 
-This makes it possible to add additional AI providers later.
+This makes it easier to add other providers in the future.
 
 ---
 
-# 🔥 Gemini + Groq Fallback
+# 🔄 AI Fallback
 
-One of the goals of Polaris is to avoid making the application completely dependent on one AI provider.
+One of the important design goals of Plex is provider resilience.
 
 For example:
 
 ```text
-User Prompt
+User Request
      │
      ▼
    Gemini
      │
-     ├── Success ──────────► Response
+     ├── Success ──────────────► Response
      │
-     └── Rate Limited/Error
+     └── Rate Limit / Failure
                 │
                 ▼
               Groq
@@ -387,38 +368,32 @@ User Prompt
              Response
 ```
 
-This is especially useful when a provider's free-tier quota is exhausted.
+The application does **not** need to call every provider simultaneously.
 
-The application should **not** send the request to every provider simultaneously.
+Instead, a provider can be attempted first and another provider can be used when an appropriate retryable failure occurs.
 
-Instead:
+Future versions can extend this architecture:
 
 ```text
-Provider 1
-   │
-   ├── success → STOP
-   │
-   └── failure
-          ↓
-Provider 2
-   │
-   ├── success → STOP
-   │
-   └── failure
-          ↓
-Provider 3
+                 AI Router
+                    │
+       ┌────────────┼─────────────┐
+       ↓            ↓             ↓
+    Gemini         Groq        Provider N
+       │            │             │
+       └────────────┼─────────────┘
+                    ↓
+                 Response
 ```
-
-This architecture can be extended later with additional providers.
 
 ---
 
 # 📂 Project Structure
 
-A simplified structure looks like:
+A simplified version of the project structure:
 
 ```text
-polaris/
+plex/
 │
 ├── convex/
 │   ├── _generated/
@@ -456,7 +431,6 @@ polaris/
 │       └── utils.ts
 │
 ├── public/
-│   └── ...
 │
 ├── package.json
 ├── tsconfig.json
@@ -464,60 +438,51 @@ polaris/
 └── README.md
 ```
 
-> The exact structure may evolve as Polaris grows.
-
----
-
-# 🛠️ Tech Stack
-
-| Technology        | Purpose                    |
-| ----------------- | -------------------------- |
-| **Next.js**       | Full-stack React framework |
-| **React**         | User interface             |
-| **TypeScript**    | Type safety                |
-| **Tailwind CSS**  | Styling                    |
-| **Convex**        | Backend + database         |
-| **Clerk**         | Authentication             |
-| **Zustand**       | Client-side state          |
-| **CodeMirror**    | Code editor                |
-| **Allotment**     | Resizable panels           |
-| **Lucide React**  | Icons                      |
-| **date-fns**      | Date/time formatting       |
-| **Vercel AI SDK** | AI integration             |
-| **Gemini**        | AI provider                |
-| **Groq**          | AI provider/fallback       |
-
 ---
 
 # 🚀 Getting Started
 
-Follow these steps to run Polaris locally.
+Follow these steps to run Plex locally.
 
-## 1. Clone the repository
+## Prerequisites
+
+Make sure you have installed:
+
+* Node.js
+* pnpm
+* Git
+
+Check your versions:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/polaris.git
-```
-
-Enter the project:
-
-```bash
-cd polaris
+node --version
+pnpm --version
+git --version
 ```
 
 ---
 
-# 2. Install dependencies
+# 1. Clone Plex
 
-Polaris uses **pnpm**.
+```bash
+git clone https://github.com/YOUR_USERNAME/plex.git
+```
 
-Install dependencies:
+Then:
+
+```bash
+cd plex
+```
+
+---
+
+# 2. Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-If you don't have pnpm installed:
+If pnpm isn't installed:
 
 ```bash
 npm install -g pnpm
@@ -531,15 +496,15 @@ pnpm install
 
 ---
 
-# 3. Configure environment variables
+# 3. Environment Variables
 
-Create:
+Create a file in the project root:
 
 ```text
 .env.local
 ```
 
-in the root of the project.
+Add the required environment variables.
 
 Example:
 
@@ -558,11 +523,15 @@ GEMINI_API_KEY=your_gemini_api_key
 GROQ_API_KEY=your_groq_api_key
 ```
 
-### ⚠️ Important
+> Your exact environment variable names should match the names used by your current implementation.
 
-Never commit `.env.local` to GitHub.
+---
 
-Make sure your `.gitignore` contains:
+# 🔒 Environment Security
+
+Never commit secrets to GitHub.
+
+Your `.gitignore` should contain:
 
 ```gitignore
 .env
@@ -570,11 +539,20 @@ Make sure your `.gitignore` contains:
 .env.*.local
 ```
 
+Never expose private API keys using:
+
+```env
+NEXT_PUBLIC_GEMINI_API_KEY=...
+NEXT_PUBLIC_GROQ_API_KEY=...
+```
+
+Private API credentials should remain server-side.
+
 ---
 
 # 4. Configure Clerk
 
-Create a Clerk application and obtain the required keys.
+Create a Clerk application and obtain your credentials.
 
 Add them to:
 
@@ -582,7 +560,7 @@ Add them to:
 .env.local
 ```
 
-Example:
+For example:
 
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
@@ -593,15 +571,15 @@ CLERK_SECRET_KEY=...
 
 # 5. Configure Convex
 
-Start the Convex development environment:
+Start Convex development:
 
 ```bash
 pnpm convex dev
 ```
 
-Convex will generate the required configuration and backend files.
+Keep this terminal running.
 
-Keep the Convex process running while developing.
+Convex will handle the backend development environment and synchronize your backend with the application.
 
 ---
 
@@ -612,42 +590,42 @@ Keep the Convex process running while developing.
 Add your Gemini API key:
 
 ```env
-GEMINI_API_KEY=your_key
+GEMINI_API_KEY=your_api_key
 ```
 
 ## Groq
 
-Add:
+Add your Groq API key:
 
 ```env
-GROQ_API_KEY=your_key
+GROQ_API_KEY=your_api_key
 ```
 
-Groq can then be used as an alternative/fallback provider.
+These providers can be used by the AI layer according to the application's provider configuration.
 
 ---
 
-# 7. Start the development server
+# 7. Start Plex
 
-In another terminal:
+Open another terminal and run:
 
 ```bash
 pnpm dev
 ```
 
-Polaris should now be available at:
+The application should be available at:
 
 ```text
 http://localhost:3000
 ```
 
-Open it in your browser.
+Open the address in your browser.
 
 ---
 
-# 🧪 Development Workflow
+# 🧪 Local Development
 
-A typical local development setup uses two terminals.
+A typical development setup uses two terminals.
 
 ### Terminal 1
 
@@ -661,7 +639,7 @@ pnpm convex dev
 pnpm dev
 ```
 
-Then open:
+Then visit:
 
 ```text
 http://localhost:3000
@@ -669,15 +647,27 @@ http://localhost:3000
 
 ---
 
-# 🧩 Useful Commands
+# ⚙️ Useful Commands
 
-### Start Next.js
+### Install dependencies
+
+```bash
+pnpm install
+```
+
+### Start development server
 
 ```bash
 pnpm dev
 ```
 
-### Build production version
+### Start Convex
+
+```bash
+pnpm convex dev
+```
+
+### Build the application
 
 ```bash
 pnpm build
@@ -687,12 +677,6 @@ pnpm build
 
 ```bash
 pnpm start
-```
-
-### Install dependencies
-
-```bash
-pnpm install
 ```
 
 ### Add a package
@@ -707,233 +691,155 @@ Example:
 pnpm add @ai-sdk/groq
 ```
 
-### Start Convex
-
-```bash
-pnpm convex dev
-```
-
 ### Run a Convex function
 
 ```bash
 pnpm convex run <functionName>
 ```
 
-Example:
+---
 
-```bash
-pnpm convex run projects:getProject
+# 🛠️ Development Workflow
+
+A typical workflow looks like:
+
+```text
+1. Create Project
+       ↓
+2. Open Project
+       ↓
+3. Browse Files
+       ↓
+4. Open File
+       ↓
+5. Edit Code
+       ↓
+6. Use AI Assistance
+       ↓
+7. Save / Update Project
 ```
 
 ---
 
-# 🧑‍💻 Using Polaris
+# 🧠 Data Flow
 
-Once Polaris is running locally:
-
-## 1. Sign in
-
-Create an account or sign in using Clerk.
-
-## 2. Create a project
-
-Create a project from the project interface.
-
-## 3. Open the project
-
-Open the project to enter the workspace.
-
-## 4. Browse files
-
-Use the sidebar to navigate through project files.
-
-## 5. Open a file
-
-Click a file to open it inside the CodeMirror editor.
-
-## 6. Use tabs
-
-Files can be opened as preview tabs or pinned tabs.
-
-## 7. Resize the workspace
-
-Drag the divider between the sidebar and editor to resize the panels.
-
-## 8. Use AI
-
-Send a coding request through the AI interface.
-
-The AI layer can route requests to the configured provider.
-
----
-
-# 🔄 Application Data Flow
-
-A typical project request looks like:
+## Project Data
 
 ```text
 User
  │
  ▼
-Next.js Component
+Plex UI
  │
  ▼
-Custom React Hook
+Project Hook
  │
  ▼
-Convex Query / Mutation
+Convex Mutation
  │
  ▼
-Convex Backend
- │
- ▼
-Database
- │
- ▼
-Updated State
- │
- ▼
-React UI
+Convex Database
 ```
 
-For AI:
+## Editor
 
 ```text
-User
+File
  │
  ▼
-AI UI
+Editor Component
  │
  ▼
-Server-side AI logic
+CodeMirror
  │
  ▼
-AI SDK
+Editor State
  │
  ▼
-Gemini
+Zustand
+```
+
+## AI
+
+```text
+User Prompt
  │
- ├── success → response
+ ▼
+AI Interface
  │
- └── failure → Groq
-                  │
-                  ▼
-               response
+ ▼
+Server-side AI Logic
+ │
+ ▼
+Vercel AI SDK
+ │
+ ├── Gemini
+ │
+ └── Groq
+ │
+ ▼
+Generated Response
+ │
+ ▼
+Plex UI
 ```
 
 ---
 
-# 🔒 Security
+# 🎨 UI Philosophy
 
-Polaris follows an important rule:
+Plex is designed around a modern developer-tool aesthetic.
 
-> **Never expose private API keys to the browser.**
+The interface prioritizes:
 
-Sensitive keys such as:
+* Minimal distractions
+* Clear navigation
+* Fast interactions
+* IDE-like workflows
+* Keyboard-friendly interaction
+* Resizable panels
+* Familiar developer patterns
 
-```text
-GEMINI_API_KEY
-GROQ_API_KEY
-CLERK_SECRET_KEY
-```
-
-must remain server-side.
-
-Never use:
-
-```env
-NEXT_PUBLIC_GEMINI_API_KEY=...
-```
-
-for private API credentials.
-
-Only variables that are intentionally safe for browser exposure should use the `NEXT_PUBLIC_` prefix.
+The goal is to make Plex feel less like a traditional website and more like a **development environment running in the browser**.
 
 ---
 
-# 🧠 Design Philosophy
+# 🗺️ Roadmap
 
-Polaris is built around a few principles.
-
-### 1. Developer First
-
-The interface should feel familiar to developers.
-
-### 2. Modular Architecture
-
-Features should remain separated and reusable.
-
-```text
-Projects
-   │
-   ├── Components
-   ├── Hooks
-   └── Data
-
-Editor
-   │
-   ├── Components
-   └── Extensions
-
-AI
-   │
-   ├── Providers
-   └── Router
-```
-
-### 3. Provider Independence
-
-AI functionality should not depend completely on a single provider.
-
-### 4. Type Safety
-
-TypeScript is used throughout the application to reduce runtime errors and make refactoring safer.
-
-### 5. Real-time Data
-
-Convex provides a reactive backend architecture for keeping application data synchronized.
-
----
-
-# 🗺️ Future Roadmap
-
-Polaris is an evolving project.
+Plex is an evolving project.
 
 Potential future improvements include:
 
 * [ ] Advanced AI coding agent
-* [ ] Multi-file AI edits
+* [ ] Multi-file AI modifications
 * [ ] AI-powered debugging
+* [ ] AI code explanation
 * [ ] AI autocomplete
-* [ ] Terminal integration
+* [ ] Integrated terminal
 * [ ] Git integration
 * [ ] GitHub integration
-* [ ] Real-time collaborative editing
-* [ ] Project sharing
-* [ ] More programming languages
-* [ ] Better code intelligence
 * [ ] File search
 * [ ] Command palette
 * [ ] Keyboard shortcuts
-* [ ] AI provider routing
-* [ ] Local AI support
-* [ ] Ollama integration
-* [ ] More AI providers
+* [ ] Project sharing
+* [ ] Real-time collaboration
+* [ ] More programming languages
+* [ ] Better code intelligence
 * [ ] Deployment integration
+* [ ] More AI providers
+* [ ] Local AI support
+* [ ] Ollama support
+* [ ] AI provider load balancing
 
 ---
 
 # 🤝 Contributing
 
-Contributions, ideas, and feedback are welcome.
+Contributions are welcome.
 
 ## Fork the repository
 
-```bash
-git fork
-```
-
-Or fork the project directly through GitHub.
+Fork Plex on GitHub.
 
 ## Create a branch
 
@@ -954,21 +860,44 @@ git commit -m "feat: add my feature"
 git push origin feature/my-feature
 ```
 
-Then open a Pull Request.
+Then create a Pull Request.
 
 ---
 
-# 🐛 Reporting Issues
+# 🐛 Bug Reports
 
-If you find a bug, please open an issue with:
+Found a bug?
 
-1. A clear description
+Open an issue and include:
+
+1. Description of the problem
 2. Steps to reproduce
 3. Expected behavior
 4. Actual behavior
-5. Browser/OS information
-6. Relevant error messages
-7. Screenshots when useful
+5. Browser and operating system
+6. Error messages
+7. Screenshots if relevant
+
+---
+
+# 💡 Feature Requests
+
+Have an idea for Plex?
+
+Open an issue describing:
+
+* What you want to add
+* Why it would be useful
+* How you think it could work
+* Any relevant examples
+
+---
+
+# 🔐 Security
+
+If you discover a security vulnerability, please do not publicly disclose sensitive details immediately.
+
+Contact the project maintainer privately so the issue can be investigated and resolved responsibly.
 
 ---
 
@@ -982,82 +911,85 @@ For example:
 MIT License
 ```
 
-If the project is not yet licensed, specify that clearly before publishing it publicly.
+If Plex does not currently have a license, specify that clearly before publishing it publicly.
 
 ---
 
-# 🌟 Why Polaris?
+# 🌟 Vision
 
-Polaris isn't just another code editor.
+Plex is more than a code editor.
 
-The idea is to create a development environment where:
+It is an attempt to create a development environment where:
 
 ```text
-             CODE
-              │
-              ▼
-          ┌───────┐
-          │POLARIS│
-          └───────┘
-          ▲   ▲   ▲
-          │   │   │
-        FILES AI PROJECTS
+                ┌──────────────┐
+                │     PLEX     │
+                └──────┬───────┘
+                       │
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+      PROJECTS        CODE             AI
+        │              │              │
+        ↓              ↓              ↓
+      FILES         EDITOR          AGENT
+        │              │              │
+        └──────────────┼──────────────┘
+                       ↓
+                  DEVELOPMENT
 ```
 
-Everything developers need to build software should feel like part of **one connected workspace**.
+The long-term goal is simple:
 
-The project is being built around a simple vision:
-
-> **Make software development more accessible, intelligent, and enjoyable by bringing code, projects, and AI together.**
-
----
-
-# ⭐ Support the Project
-
-If you find Polaris interesting or useful:
-
-⭐ Star the repository
-🐛 Report bugs
-💡 Suggest features
-🔧 Contribute improvements
-📢 Share the project
-
-Every contribution helps Polaris grow.
+> **Build a powerful, intelligent development environment that lives in the browser.**
 
 ---
 
 # ⚡ Quick Start
 
-For experienced developers:
-
 ```bash
-git clone https://github.com/YOUR_USERNAME/polaris.git
+git clone https://github.com/YOUR_USERNAME/plex.git
 
-cd polaris
+cd plex
 
 pnpm install
+```
 
+Configure:
+
+```text
+.env.local
+```
+
+Then run:
+
+### Terminal 1
+
+```bash
 pnpm convex dev
 ```
 
-In another terminal:
+### Terminal 2
 
 ```bash
 pnpm dev
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:3000
 ```
 
-Configure your `.env.local` first if authentication, Convex, or AI features require environment variables.
+---
+
+# ❤️ Built with
+
+**Next.js · React · TypeScript · Convex · Clerk · CodeMirror · Zustand · Allotment · Vercel AI SDK**
 
 ---
 
-# 🚀 Polaris
+## ⭐ Plex
 
-**Code. Create. Explore.**
+**Code. Create. Build.**
 
-Built with modern web technologies and an AI-first mindset.
+*A browser-native development environment powered by modern web technologies and AI.*
