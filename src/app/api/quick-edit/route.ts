@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import {
   resolveTextModel,
-  withGroqFallback,
+  withAiFallback,
 } from "@/lib/ai-providers";
 import { firecrawl } from "@/lib/firecrawl";
 
@@ -104,9 +104,9 @@ export async function POST(request: Request) {
       .replace("{instruction}", instruction)
       .replace("{documentation}", documentationContext);
 
-    const { output } = await withGroqFallback((provider) =>
+    const { output } = await withAiFallback((slot) =>
       generateText({
-        model: resolveTextModel(provider),
+        model: resolveTextModel(slot),
         output: Output.object({ schema: quickEditSchema }),
         prompt,
       }),

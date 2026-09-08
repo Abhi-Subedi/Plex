@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import {
   resolveTextModel,
-  withGroqFallback,
+  withAiFallback,
 } from "@/lib/ai-providers";
 
 const suggestionSchema = z.object({
@@ -78,9 +78,9 @@ export async function POST(request: Request) {
       .replace("{nextLines}", nextLines || "")
       .replace("{lineNumber}", lineNumber.toString());
 
-    const { output } = await withGroqFallback((provider) =>
+    const { output } = await withAiFallback((slot) =>
       generateText({
-        model: resolveTextModel(provider),
+        model: resolveTextModel(slot),
         output: Output.object({ schema: suggestionSchema }),
         prompt,
       }),

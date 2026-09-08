@@ -2,7 +2,7 @@ import { generateText } from "ai";
 import { inngest } from "./client";
 import {
   resolveTextModel,
-  withGroqFallback,
+  withAiFallback,
 } from "@/lib/ai-providers";
 import { firecrawl } from "@/lib/firecrawl";
 
@@ -33,9 +33,9 @@ export const demoGenerate = inngest.createFunction(
       : prompt;
 
     await step.run("generate-text", async () => {
-      return await withGroqFallback((provider) =>
+      return await withAiFallback((slot) =>
         generateText({
-          model: resolveTextModel(provider),
+          model: resolveTextModel(slot),
           prompt: finalPrompt,
           experimental_telemetry: {
             isEnabled: true,

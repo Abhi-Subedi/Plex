@@ -5,24 +5,56 @@
  * NEVER import this module from client components.
  */
 
-import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 import { groq } from "@ai-sdk/groq";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { gemini, openai } from "@inngest/agent-kit";
 
 /** Primary provider model (Google AI Studio / Gemini API). */
 export const GEMINI_MODEL_ID = "gemini-3.6-flash";
 
-/** Fallback provider model (Groq, OpenAI-compatible). Strong reasoning + tool calling. */
+/** Fallback provider models (Groq, OpenAI-compatible). */
 export const GROQ_MODEL_ID = "openai/gpt-oss-120b";
+export const GROQ_SMALL_MODEL_ID = "openai/gpt-oss-20b";
 
 /** Small fallback model for cheap tasks like title generation. */
 export const GROQ_TITLE_MODEL_ID = "openai/gpt-oss-20b";
 
+/** OpenRouter models (verified live against the OpenRouter catalog). */
+export const OPENROUTER_CODING_MODEL_ID = "google/gemini-3.8-flash";
+export const OPENROUTER_TITLE_MODEL_ID = "google/gemini-3.5-flash-lite";
+
 /** Base URL for Groq's OpenAI-compatible API. */
 export const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
 
-export type AiProvider = "gemini" | "groq";
+/** Base URL for OpenRouter's OpenAI-compatible API (used by the agent path). */
+export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+
+export type AiProvider = "gemini" | "groq" | "openrouter";
+
+/** One attempt slot: a provider plus the exact model to try on it. */
+export interface AiSlot {
+  provider: AiProvider;
+  model: string;
+}
+
+/**
+ * Ordered attempt chain for coding/structured tasks. Each slot is tried
+ * at most once, in order, advancing only on retryable errors.
+ */
+export const CODING_CHAIN: AiSlot[] = [
+  { provider: "gemini", model: GEMINI_MODEL_ID },
+  { provider: "groq", model: GROQ_MODEL_ID },
+  { provider: "groq", model: GROQ_SMALL_MODEL_ID },
+  { provider: "openrouter", model: OPENROUTER_CODING_MODEL_ID },
+];
+
+/** Ordered attempt chain for cheap tasks like title generation. */
+export const TITLE_CHAIN: AiSlot[] = [
+  { provider: "gemini", model: GEMINI_MODEL_ID },
+  { provider: "groq", model: GROQ_TITLE_MODEL_ID },
+  { provider: "openrouter", model: OPENROUTER_TITLE_MODEL_ID },
+];
 
 const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504, 529]);
 
@@ -74,53 +106,85 @@ export function isQuotaError(error: unknown): boolean {
   return /429|quota|rate.?limit|resource.?exhausted/i.test(getMessage(error));
 }
 
-/** Resolves a Vercel AI SDK model for the given provider. */
-export function resolveTextModel(provider: AiProvider, modelId?: string) {
-  return provider === "gemini"
-    ? google(modelId ?? GEMINI_MODEL_ID)
-    : groq(modelId ?? GROQ_MODEL_ID);
+/** Resolves a Vercel AI SDK model for the given chain slot. */
+export function resolveTextModel(slot: AiSlot) {
+  switch (slot.provider) {
+    case "gemini":
+      return google(slot.model);
+    case "groq":
+      return groq(slot.model);
+    case "openrouter":
+      return createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY }).chat(
+        slot.model,
+      );
+  }
 }
 
 /**
- * Runs `run` on Gemini first. Only if Gemini fails with a retryable error
- * (429/rate-limit/quota, 5xx, timeout, retired model) it runs the SAME
- * callback once for Groq. Groq is never called when Gemini succeeds,
- * and neither provider is retried in a loop.
+ * Runs `run` against each chain slot in order, starting with Gemini.
+ * Advances to the next slot only on retryable errors (429/rate-limit/quota,
+ * 5xx, timeout, retired model). Stops at the first success or the first
+ * non-retryable error. Each slot is attempted at most once - no loops.
  *
- * Throws a clean Error (original attached as `cause`) when both fail.
+ * Throws a clean Error (original attached as `cause`) when every slot fails.
+ */
+export async function withAiFallback<T>(
+  run: (slot: AiSlot) => Promise<T>,
+  chain: AiSlot[] = CODING_CHAIN,
+): Promise<T> {
+  let lastError: unknown;
+
+  for (const slot of chain) {
+    if (!isProviderConfigured(slot.provider)) {
+      continue;
+    }
+    try {
+      return await run(slot);
+    } catch (error) {
+      lastError = error;
+      if (!isRetryableAiError(error)) {
+        console.error(
+          `withAiFallback: ${slot.provider}/${slot.model} failed with non-retryable error, stopping chain.`,
+          error,
+        );
+        break;
+      }
+      console.warn(
+        `withAiFallback: ${slot.provider}/${slot.model} failed with retryable error, trying next slot.`,
+        error,
+      );
+    }
+  }
+
+  throw new Error("AI service temporarily unavailable. Please try again.", {
+    cause: lastError,
+  });
+}
+
+/**
+ * Backwards-compatible single-fallback wrapper: Gemini first, Groq once.
+ * Prefer withAiFallback for new code.
  */
 export async function withGroqFallback<T>(
   run: (provider: AiProvider) => Promise<T>,
 ): Promise<T> {
-  try {
-    return await run("gemini");
-  } catch (error) {
-    if (!isRetryableAiError(error)) {
-      console.error(
-        "withGroqFallback: Gemini failed with non-retryable error, skipping Groq fallback.",
-        error,
-      );
-      throw new Error("AI request failed. Please try again.", {
-        cause: error,
-      });
-    }
+  return withAiFallback(
+    (slot) => run(slot.provider),
+    CODING_CHAIN.filter((slot) => slot.provider !== "openrouter"),
+  );
+}
 
-    console.warn(
-      "withGroqFallback: Gemini failed with retryable error, falling back to Groq once.",
-      error,
-    );
-    try {
-      return await run("groq");
-    } catch (fallbackError) {
-      console.error(
-        "withGroqFallback: Groq fallback also failed.",
-        fallbackError,
+/** True when the provider has an API key configured. */
+export function isProviderConfigured(provider: AiProvider): boolean {
+  switch (provider) {
+    case "gemini":
+      return !!(
+        process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
       );
-      throw new Error(
-        "AI service temporarily unavailable. Please try again.",
-        { cause: fallbackError },
-      );
-    }
+    case "groq":
+      return !!process.env.GROQ_API_KEY;
+    case "openrouter":
+      return !!process.env.OPENROUTER_API_KEY;
   }
 }
 
@@ -161,4 +225,38 @@ export function buildGroqAgentModel(
       max_completion_tokens: params.maxTokens,
     },
   });
+}
+
+/** Agent-kit model for the OpenRouter fallback via its OpenAI-compatible endpoint. */
+export function buildOpenRouterAgentModel(
+  modelId: string,
+  params: { temperature: number; maxTokens: number },
+) {
+  return openai({
+    model: modelId,
+    baseUrl: OPENROUTER_BASE_URL,
+    apiKey: process.env.OPENROUTER_API_KEY,
+    defaultParameters: {
+      temperature: params.temperature,
+      max_completion_tokens: params.maxTokens,
+    },
+  });
+}
+
+/** Builds an agent-kit model for any chain slot. */
+export function buildAgentModel(
+  slot: AiSlot,
+  params: { temperature: number; maxTokens: number },
+) {
+  switch (slot.provider) {
+    case "gemini":
+      return buildGeminiAgentModel({
+        temperature: params.temperature,
+        maxOutputTokens: params.maxTokens,
+      });
+    case "groq":
+      return buildGroqAgentModel(slot.model, params);
+    case "openrouter":
+      return buildOpenRouterAgentModel(slot.model, params);
+  }
 }

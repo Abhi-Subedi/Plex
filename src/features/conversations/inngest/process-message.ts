@@ -2,12 +2,13 @@ import { createAgent, createNetwork } from "@inngest/agent-kit";
 
 import { inngest } from "@/inngest/client";
 import {
-  GROQ_MODEL_ID,
-  GROQ_TITLE_MODEL_ID,
-  buildGeminiAgentModel,
-  buildGroqAgentModel,
+  CODING_CHAIN,
+  TITLE_CHAIN,
+  buildAgentModel,
+  isProviderConfigured,
   isQuotaError,
   isRetryableAiError,
+  type AiSlot,
 } from "@/lib/ai-providers";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { NonRetriableError } from "inngest";
@@ -119,17 +120,11 @@ export const processMessage = inngest.createFunction(
     const shouldGenerateTitle =
       conversation.title === DEFAULT_CONVERSATION_TITLE;
 
-    type AgentModel =
-      | ReturnType<typeof buildGeminiAgentModel>
-      | ReturnType<typeof buildGroqAgentModel>;
-
-    const groqConfigured = !!process.env.GROQ_API_KEY;
-
-    const runTitleAgent = async (model: AgentModel) => {
+    const runTitleAgent = async (slot: AiSlot) => {
       const titleAgent = createAgent({
         name: "title-generator",
         system: TITLE_GENERATOR_SYSTEM_PROMPT,
-        model,
+        model: buildAgentModel(slot, { temperature: 0, maxTokens: 50 }),
       });
 
       const { output } = await titleAgent.run(message, { step });
@@ -160,43 +155,35 @@ export const processMessage = inngest.createFunction(
     };
 
     if (shouldGenerateTitle) {
-      // Title is cosmetic - never let it kill the whole reply (e.g. on 429).
-      try {
-        await runTitleAgent(
-          buildGeminiAgentModel({ temperature: 0, maxOutputTokens: 50 }),
-        );
-      } catch (error) {
-        if (!isRetryableAiError(error) || !groqConfigured) {
-          console.warn("Title generation skipped:", error);
-        } else {
+      // Title is cosmetic - walk the chain, skipping providers with no key,
+      // and never let a title failure kill the whole reply.
+      let titled = false;
+      for (const slot of TITLE_CHAIN) {
+        if (!isProviderConfigured(slot.provider)) continue;
+        try {
+          await runTitleAgent(slot);
+          titled = true;
+          break;
+        } catch (error) {
+          if (!isRetryableAiError(error)) break;
           console.warn(
-            "Gemini title failed with retryable error, falling back to Groq once.",
+            `Title via ${slot.provider}/${slot.model} failed with retryable error, trying next slot.`,
             error,
           );
-          try {
-            await runTitleAgent(
-              buildGroqAgentModel(GROQ_TITLE_MODEL_ID, {
-                temperature: 0,
-                maxTokens: 50,
-              }),
-            );
-          } catch (fallbackError) {
-            console.warn(
-              "Groq title fallback also failed, skipping title.",
-              fallbackError,
-            );
-          }
         }
+      }
+      if (!titled) {
+        console.warn("Title generation skipped: no provider succeeded.");
       }
     }
 
-    // Runs the coding agent on the given provider model and returns its text.
-    const runCodingNetwork = async (model: AgentModel): Promise<string> => {
+    // Runs the coding agent on the given chain slot and returns its text.
+    const runCodingNetwork = async (slot: AiSlot): Promise<string> => {
       const codingAgent = createAgent({
         name: "plex",
         description: "An expert AI coding assistant",
         system: systemPrompt,
-        model,
+        model: buildAgentModel(slot, { temperature: 0.3, maxTokens: 8192 }),
         tools: [
           createListFilesTool({ internalKey, projectId }),
           createReadFilesTool({ internalKey }),
@@ -250,53 +237,37 @@ export const processMessage = inngest.createFunction(
       return "I processed your request. Let me know if you need anything else!";
     };
 
-    // Gemini first; on retryable errors (429/quota, 5xx, retired model)
-    // fall back to Groq exactly once. Never retried in a loop.
-    let assistantResponse: string;
-    try {
-      assistantResponse = await runCodingNetwork(
-        buildGeminiAgentModel({ temperature: 0.3, maxOutputTokens: 8192 }),
-      );
-    } catch (error) {
-      if (!isRetryableAiError(error)) throw error;
+    // Walk the chain: Gemini first, then Groq models, then OpenRouter.
+    // Each slot is attempted at most once, advancing only on retryable
+    // errors. Unconfigured providers (no API key) are skipped without a call.
+    let assistantResponse: string | undefined;
+    let lastError: unknown;
+    let sawQuota = false;
 
-      if (!groqConfigured) {
+    for (const slot of CODING_CHAIN) {
+      if (!isProviderConfigured(slot.provider)) continue;
+      try {
+        assistantResponse = await runCodingNetwork(slot);
+        break;
+      } catch (error) {
+        lastError = error;
+        if (isQuotaError(error)) sawQuota = true;
+        if (!isRetryableAiError(error)) break;
         console.warn(
-          "Gemini failed with retryable error and GROQ_API_KEY is not configured, skipping Groq fallback.",
+          `Coding via ${slot.provider}/${slot.model} failed with retryable error, trying next slot.`,
           error,
         );
-        if (isQuotaError(error)) {
-          assistantResponse =
-            "I'm out of Gemini API quota for today (free tier allows ~20 requests/day, and each agentic step uses one). " +
-            "Usage resets daily - check https://ai.dev/rate-limit - or add billing to your Google AI project for higher limits. " +
-            "You can also add a GROQ_API_KEY to .env.local so I fall back to Groq automatically next time. " +
-            "Your project and files are safe; just send your message again once quota resets.";
-        } else {
-          throw error;
-        }
+      }
+    }
+
+    if (assistantResponse === undefined) {
+      if (sawQuota) {
+        assistantResponse =
+          "All AI providers are unavailable right now (Gemini is out of its daily free quota and the Groq/OpenRouter fallbacks also failed). " +
+          "Usage resets daily - check https://ai.dev/rate-limit - or add billing for higher limits. " +
+          "Your project and files are safe; just send your message again later.";
       } else {
-        console.warn(
-          "Gemini coding agent failed with retryable error, falling back to Groq once.",
-          error,
-        );
-        try {
-          assistantResponse = await runCodingNetwork(
-            buildGroqAgentModel(GROQ_MODEL_ID, {
-              temperature: 0.3,
-              maxTokens: 8192,
-            }),
-          );
-        } catch (fallbackError) {
-          console.error("Groq fallback also failed:", fallbackError);
-          if (isQuotaError(error) || isQuotaError(fallbackError)) {
-            assistantResponse =
-              "Both AI providers are unavailable right now (Gemini is out of its daily free quota and the Groq fallback also failed). " +
-              "Usage resets daily - check https://ai.dev/rate-limit - or add billing for higher limits. " +
-              "Your project and files are safe; just send your message again later.";
-          } else {
-            throw fallbackError;
-          }
-        }
+        throw lastError;
       }
     }
 
