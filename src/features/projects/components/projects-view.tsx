@@ -1,24 +1,18 @@
 "use client";
 
-import { Poppins } from "next/font/google";
 import { SparkleIcon } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { UserButton } from "@clerk/nextjs";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
+import { Logo } from "@/components/logo";
 
 import { ProjectsList } from "./projects-list";
 import { ProjectsCommandDialog } from "./projects-command-dialog";
 import { ImportGithubDialog } from "./import-github-dialog";
 import { NewProjectDialog } from "./new-project-dialog";
-
-const font = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-})
 
 export const ProjectsView = () => {
   const [commandDialogOpen, setCommandDialogOpen] = useState(false);
@@ -68,13 +62,7 @@ export const ProjectsView = () => {
           <div className="flex justify-between gap-4 w-full items-center">
 
             <div className="flex items-center gap-2 w-full group/logo">
-              <img src="/logo.svg" alt="Plex" className="size-[32px] md:size-[46px]" />
-              <h1 className={cn(
-                "text-4xl md:text-5xl font-semibold",
-                font.className,
-              )}>
-                Plex
-              </h1>
+              <Logo className="h-10 md:h-12" />
             </div>
             <div className="flex items-center gap-2">
               <UserButton />

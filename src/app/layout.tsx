@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
-import { Providers } from "@/components/providers";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import "allotment/dist/style.css";
 import "./globals.css";
@@ -21,6 +21,13 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Plex",
   description: "Plex - AI-powered cloud IDE",
+  icons: {
+    icon: [
+      { url: "/plex-alt.png", media: "(prefers-color-scheme: dark)" },
+      { url: "/plex-logo.png", media: "(prefers-color-scheme: light)" },
+    ],
+    apple: "/plex-logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -33,10 +40,15 @@ export default function RootLayout({
         <body
           className={`${inter.variable} ${plexMono.variable} antialiased`}
         >
-          <Providers>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             {children}
             <Toaster />
-          </Providers>
+          </ThemeProvider>
         </body>
       </html>
   );

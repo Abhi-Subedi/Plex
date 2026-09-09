@@ -76,6 +76,7 @@
     "cmdk": "^1.1.1",
     "codemirror": "^6.0.2",
     "convex": "^1.45.0",
+    "crypto": "^1.0.1",
     "date-fns": "^4.4.0",
     "embla-carousel-react": "^8.6.0",
     "inngest": "^3.54.2",

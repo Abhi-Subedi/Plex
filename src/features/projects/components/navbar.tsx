@@ -1,11 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { CloudCheckIcon, LoaderIcon } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
-import { Poppins } from "next/font/google";
 import { formatDistanceToNow } from "date-fns";
 
 import {
@@ -22,15 +20,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Logo } from "@/components/logo";
 
 import { Id } from "../../../../convex/_generated/dataModel";
 import { useProject, useRenameProject } from "../hooks/use-projects";
-
-const font = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-})
 
 export const Navbar = ({
   projectId
@@ -82,21 +75,8 @@ export const Navbar = ({
                   className="w-fit! p-1.5! h-7!"
                   asChild
                 >
-                  <Link href="/">
-                    <Image
-                      src="/logo.svg"
-                      alt="Logo"
-                      width={20}
-                      height={20}
-                    />
-                    <span
-                      className={cn(
-                        "text-sm font-medium",
-                        font.className,
-                      )}
-                    >
-                      Plex
-                    </span>
+                  <Link href="/app">
+                    <Logo className="h-5" />
                   </Link>
                 </Button>
               </BreadcrumbLink>
